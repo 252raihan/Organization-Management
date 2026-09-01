@@ -12,6 +12,11 @@ export const APP_CONFIG = {
     "একটি অরাজনৈতিক, অলাভজনক ও সামাজিক সেবামূলক প্রতিষ্ঠান। এলাকার সুবিধাবঞ্চিত মানুষের পাশে দাঁড়ানো এবং সামাজিক উন্নয়নে আমরা অঙ্গীকারবদ্ধ।",
 };
 
+/**
+ * Locked business constant: Required monthly contribution per member (৳100).
+ */
+export const MONTHLY_DEPOSIT_AMOUNT = 100;
+
 export const BLOOD_GROUPS = [
   { label: "A+", value: "A_POSITIVE" },
   { label: "A-", value: "A_NEGATIVE" },
