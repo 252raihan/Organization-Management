@@ -3,8 +3,32 @@
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { loginSchema } from "@/lib/validations/auth";
-import { setSessionCookie, clearSessionCookie, createSessionToken } from "@/lib/auth";
+import {
+  setSessionCookie,
+  clearSessionCookie,
+  createSessionToken,
+  getCurrentUser,
+} from "@/lib/auth";
 import { createAuditLog } from "@/lib/audit";
+
+function isSafeInternalCallbackUrl(
+  value: unknown,
+  role: "ADMIN" | "MEMBER"
+): value is string {
+  if (typeof value !== "string" || !value.startsWith("/") || value.startsWith("//")) {
+    return false;
+  }
+
+  try {
+    const url = new URL(value, "http://localhost");
+    const allowedPath = role === "ADMIN"
+      ? url.pathname.startsWith("/admin") || url.pathname.startsWith("/dashboard")
+      : url.pathname.startsWith("/dashboard");
+    return url.origin === "http://localhost" && !url.username && !url.password && allowedPath;
+  } catch {
+    return false;
+  }
+}
 
 export interface LoginResult {
   success: boolean;
@@ -29,7 +53,7 @@ export async function loginUser(formData: unknown): Promise<LoginResult> {
       };
     }
 
-    const { identifier, password } = validated.data;
+    const { identifier, password, callbackUrl } = validated.data;
     const cleanIdentifier = identifier.trim();
 
     // Query user by phone or email
@@ -52,13 +76,6 @@ export async function loginUser(formData: unknown): Promise<LoginResult> {
       };
     }
 
-    if (!user.isActive) {
-      return {
-        success: false,
-        error: "আপনার একাউন্টটি বর্তমানে স্থগিত বা নিষ্ক্রিয় রয়েছে। পরিচালকের সাথে যোগাযোগ করুন।",
-      };
-    }
-
     const isValidPassword = await bcrypt.compare(password, user.passwordHash);
     if (!isValidPassword) {
       return {
@@ -67,12 +84,32 @@ export async function loginUser(formData: unknown): Promise<LoginResult> {
       };
     }
 
+    if (!user.isActive) {
+      return {
+        success: false,
+        error: "আপনার অ্যাকাউন্টটি বর্তমানে নিষ্ক্রিয়। পরিচালকের সাথে যোগাযোগ করুন।",
+      };
+    }
+
+    if (user.role === "MEMBER") {
+      const statusMessages = {
+        PENDING: "আপনার সদস্য আবেদন এখনো অনুমোদিত হয়নি।",
+        SUSPENDED: "আপনার সদস্য অ্যাকাউন্ট সাময়িকভাবে স্থগিত করা হয়েছে।",
+        INACTIVE: "আপনার সদস্য অ্যাকাউন্ট বর্তমানে নিষ্ক্রিয়।",
+      } as const;
+      const status = user.profile?.status;
+      if (status !== "ACTIVE") {
+        return {
+          success: false,
+          error: statusMessages[status || "PENDING"],
+        };
+      }
+    }
+
     // Generate session token & set cookie
     const token = await createSessionToken({
       id: user.id,
       role: user.role,
-      phone: user.phone,
-      name: user.name,
     });
     await setSessionCookie(token);
 
@@ -84,7 +121,10 @@ export async function loginUser(formData: unknown): Promise<LoginResult> {
       details: { role: user.role },
     });
 
-    const redirectTo = user.role === "ADMIN" ? "/admin" : "/dashboard";
+    const defaultRedirect = user.role === "ADMIN" ? "/admin" : "/dashboard";
+    const redirectTo = isSafeInternalCallbackUrl(callbackUrl, user.role)
+      ? callbackUrl
+      : defaultRedirect;
 
     return {
       success: true,
@@ -104,6 +144,25 @@ export async function loginUser(formData: unknown): Promise<LoginResult> {
  * Server-side logout action.
  */
 export async function logoutUser() {
-  await clearSessionCookie();
-  return { success: true };
+  try {
+    const user = await getCurrentUser();
+    if (user) {
+      await createAuditLog({
+        action: "USER_LOGOUT",
+        entityType: "User",
+        entityId: user.id,
+        details: { role: user.role },
+      });
+    }
+    await clearSessionCookie();
+    return { success: true };
+  } catch (error) {
+    console.error("[Logout Error]", error);
+    try {
+      await clearSessionCookie();
+    } catch {
+      // Ignore cookie cleanup errors after a failed logout audit.
+    }
+    return { success: false, error: "লগআউট করা যায়নি। আবার চেষ্টা করুন।" };
+  }
 }

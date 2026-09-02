@@ -1,9 +1,23 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { jwtVerify } from "jose/jwt/verify";
 
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET || "fallback-gswo-secret-key-at-least-32-chars-long"
-);
+function getJwtSecret(): Uint8Array | null {
+  const configuredSecret = process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET;
+  if (configuredSecret) {
+    if (configuredSecret.length < 32) {
+      return null;
+    }
+    return new TextEncoder().encode(configuredSecret);
+  }
+
+  if (process.env.NODE_ENV !== "production") {
+    return new TextEncoder().encode(
+      "development-only-gswo-secret-do-not-use-in-production"
+    );
+  }
+
+  return null;
+}
 
 interface SessionPayload {
   role?: string;
@@ -18,9 +32,10 @@ export async function middleware(request: NextRequest) {
   const token = request.cookies.get("gswo_session")?.value;
 
   let session: SessionPayload | null = null;
-  if (token) {
+  const jwtSecret = getJwtSecret();
+  if (token && jwtSecret) {
     try {
-      const { payload } = await jwtVerify(token, JWT_SECRET);
+      const { payload } = await jwtVerify(token, jwtSecret);
       session = payload as SessionPayload;
     } catch {
       session = null;
@@ -44,16 +59,6 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(url);
     }
     if (session.role !== "ADMIN") {
-      return NextResponse.redirect(new URL("/dashboard", request.url));
-    }
-  }
-
-  // Auth pages (login/register) redirect if already logged in
-  if (pathname === "/login" || pathname === "/register") {
-    if (session) {
-      if (session.role === "ADMIN") {
-        return NextResponse.redirect(new URL("/admin", request.url));
-      }
       return NextResponse.redirect(new URL("/dashboard", request.url));
     }
   }

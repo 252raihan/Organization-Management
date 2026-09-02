@@ -1,37 +1,49 @@
 import { cookies } from "next/headers";
 import { SignJWT, jwtVerify } from "jose";
-import { Role } from "@prisma/client";
+import { MemberStatus, Role } from "@prisma/client";
 import { prisma } from "./prisma";
 import type { SessionUser, AuthSession } from "@/types";
 
 export const AUTH_COOKIE_NAME = "gswo_session";
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET || "fallback-gswo-secret-key-at-least-32-chars-long"
-);
+
+function getJwtSecret(): Uint8Array {
+  const configuredSecret = process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET;
+
+  if (configuredSecret) {
+    if (configuredSecret.length < 32) {
+      throw new Error("AUTH_SECRET must be at least 32 characters long");
+    }
+    return new TextEncoder().encode(configuredSecret);
+  }
+
+  if (process.env.NODE_ENV !== "production") {
+    return new TextEncoder().encode(
+      "development-only-gswo-secret-do-not-use-in-production"
+    );
+  }
+
+  throw new Error("Authentication secret is not configured");
+}
 
 export type { SessionUser, AuthSession };
 
 export async function createSessionToken(payload: {
   id: string;
   role: Role;
-  phone: string;
-  name: string;
 }): Promise<string> {
   return new SignJWT({
     sub: payload.id,
     role: payload.role,
-    phone: payload.phone,
-    name: payload.name,
   })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime("7d")
-    .sign(JWT_SECRET);
+    .sign(getJwtSecret());
 }
 
 export async function verifySessionToken(token: string) {
   try {
-    const { payload } = await jwtVerify(token, JWT_SECRET);
+    const { payload } = await jwtVerify(token, getJwtSecret());
     return payload;
   } catch {
     return null;
@@ -66,51 +78,41 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
     const payload = await verifySessionToken(token);
     if (!payload?.sub) return null;
 
-    let dbUser = null;
-    try {
-      dbUser = await prisma.user.findUnique({
-        where: { id: payload.sub as string },
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          phone: true,
-          role: true,
-          isActive: true,
-          profile: {
-            select: {
-              memberCode: true,
-              status: true,
-            },
+    const dbUser = await prisma.user.findUnique({
+      where: { id: payload.sub as string },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+        role: true,
+        isActive: true,
+        profile: {
+          select: {
+            memberCode: true,
+            status: true,
           },
         },
-      });
-    } catch {
-      // Fallback to verified JWT session if database is offline/unreachable
+      },
+    });
+
+    if (!dbUser || !dbUser.isActive) {
+      return null;
+    }
+
+    if (dbUser.role === Role.ADMIN) {
       return {
-        id: payload.sub as string,
-        name: (payload.name as string) || "ব্যবহারকারী",
-        email: (payload.email as string) || null,
-        phone: (payload.phone as string) || "",
-        role: (payload.role as Role) || "MEMBER",
-        memberCode: (payload.memberCode as string) || null,
-        status: (payload.status as string) || "ACTIVE",
+        id: dbUser.id,
+        name: dbUser.name,
+        email: dbUser.email,
+        phone: dbUser.phone,
+        role: dbUser.role,
+        memberCode: dbUser.profile?.memberCode,
+        status: dbUser.profile?.status,
       };
     }
 
-    if (!dbUser) {
-      return {
-        id: payload.sub as string,
-        name: (payload.name as string) || "ব্যবহারকারী",
-        email: (payload.email as string) || null,
-        phone: (payload.phone as string) || "",
-        role: (payload.role as Role) || "MEMBER",
-        memberCode: (payload.memberCode as string) || null,
-        status: (payload.status as string) || "ACTIVE",
-      };
-    }
-
-    if (!dbUser.isActive) {
+    if (dbUser.role !== Role.MEMBER || dbUser.profile?.status !== MemberStatus.ACTIVE) {
       return null;
     }
 
@@ -120,8 +122,8 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
       email: dbUser.email,
       phone: dbUser.phone,
       role: dbUser.role,
-      memberCode: dbUser.profile?.memberCode,
-      status: dbUser.profile?.status,
+      memberCode: dbUser.profile.memberCode,
+      status: dbUser.profile.status,
     };
   } catch {
     return null;
@@ -138,7 +140,7 @@ export async function requireAuth(): Promise<SessionUser> {
 
 export async function requireAdmin(): Promise<SessionUser> {
   const user = await requireAuth();
-  if (user.role !== "ADMIN") {
+  if (user.role !== Role.ADMIN) {
     throw new Error("FORBIDDEN");
   }
   return user;

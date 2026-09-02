@@ -6,6 +6,7 @@ export const loginSchema = z.object({
     .trim()
     .min(1, "মোবাইল নম্বর বা ইমেইল দিন"),
   password: z.string().min(1, "পাসওয়ার্ড দিন"),
+  callbackUrl: z.string().optional(),
 });
 
 export function normalizePhoneNumber(phone: string): string {

@@ -75,10 +75,10 @@ export default function RegisterPage() {
         }
 
         setSuccessMsg(
-          result.message || "নিবন্ধন সম্পন্ন হয়েছে! আপনাকে ড্যাশবোর্ডে নিয়ে যাওয়া হচ্ছে..."
+          result.message || "নিবন্ধন সম্পন্ন হয়েছে! অনুমোদনের পর লগইন করতে পারবেন।"
         );
         setTimeout(() => {
-          router.push("/dashboard");
+          router.push("/login");
           router.refresh();
         }, 1500);
       } catch {

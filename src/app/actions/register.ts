@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { registerSchema } from "@/lib/validations/auth";
 import { generateNextMemberCode } from "@/lib/member-code";
 import { createAuditLog } from "@/lib/audit";
-import { setSessionCookie, createSessionToken } from "@/lib/auth";
+import { clearSessionCookie } from "@/lib/auth";
 import { BloodGroup } from "@prisma/client";
 
 export interface RegisterResult {
@@ -143,14 +143,8 @@ export async function registerMember(formData: unknown): Promise<RegisterResult>
       },
     });
 
-    // Auto login after registration
-    const token = await createSessionToken({
-      id: result.user.id,
-      role: result.user.role,
-      phone: result.user.phone,
-      name: result.user.name,
-    });
-    await setSessionCookie(token);
+    // A PENDING member must remain unauthenticated until admin approval.
+    await clearSessionCookie();
 
     return {
       success: true,

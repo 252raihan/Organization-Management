@@ -48,6 +48,42 @@ enum PaymentStatus {
   REFUNDED
 }
 
+enum AllocationType {
+  MONTHLY
+  ADVANCE
+  ADJUSTMENT
+}
+
+enum DonationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+  REFUNDED
+}
+
+enum ExpenseStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+enum ExpenseCategory {
+  ADMINISTRATIVE
+  RELIEF
+  HEALTHCARE
+  EDUCATION
+  EVENT
+  TRANSPORT
+  UTILITIES
+  OTHER
+}
+
+enum OpeningBalanceStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
 enum BloodGroup {
   A_POSITIVE
   A_NEGATIVE
@@ -75,9 +111,19 @@ model User {
   passwordHash  String
   role          Role           @default(MEMBER)
   isActive      Boolean        @default(true)
-  profile       MemberProfile?
-  auditLogs     AuditLog[]
-  createdAt     DateTime       @default(now())
+  profile                 MemberProfile?
+  auditLogs               AuditLog[]
+  verifiedPayments        Payment[]         @relation("PaymentVerifiedBy")
+  refundedPayments        Payment[]         @relation("PaymentRefundedBy")
+  createdAllocations      PaymentAllocation[] @relation("AllocationCreatedBy")
+  reversedAllocations     PaymentAllocation[] @relation("AllocationReversedBy")
+  verifiedDonations       Donation[]        @relation("DonationVerifiedBy")
+  refundedDonations       Donation[]        @relation("DonationRefundedBy")
+  createdExpenses         Expense[]         @relation("ExpenseCreatedBy")
+  verifiedExpenses        Expense[]         @relation("ExpenseVerifiedBy")
+  createdOpeningBalances  OpeningBalance[]  @relation("OpeningBalanceCreatedBy")
+  verifiedOpeningBalances OpeningBalance[]  @relation("OpeningBalanceVerifiedBy")
+  createdAt               DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
 
   @@index([role])
@@ -129,9 +175,13 @@ model MonthlyDeposit {
   updatedAt       DateTime      @updatedAt
 
   @@unique([memberId, month, year])
+  allocations     PaymentAllocation[]
+
   @@index([memberId])
   @@index([month, year])
   @@index([status])
+  @@index([memberId, status])
+  @@index([year, month, status])
 }
 
 model Payment {
@@ -141,26 +191,35 @@ model Payment {
   amount          Decimal       @db.Decimal(10, 2)
   paymentType     PaymentType   @default(MONTHLY_DEPOSIT)
   paymentMethod   PaymentMethod @default(BKASH)
-  transactionId   String?       @unique
-  accountNumber   String?       // Sender account / phone number
-  status          PaymentStatus @default(PENDING)
-  paymentDate     DateTime      @default(now())
-  verifiedBy      String?       // User ID or name of the admin who verified
-  verifiedAt      DateTime?
-  rejectionReason String?
-  notes           String?
-  receiptUrl      String?
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+    transactionId   String?       @unique
+    accountNumber   String?       // Sender account / phone number
+    status          PaymentStatus @default(PENDING)
+    paymentDate     DateTime      @default(now())
+    verifiedBy      String?       // Legacy verifier identifier retained for compatibility
+    verifiedByUserId String?
+    verifiedByUser User?          @relation("PaymentVerifiedBy", fields: [verifiedByUserId], references: [id], onDelete: SetNull)
+    verifiedAt      DateTime?
+    rejectionReason String?
+    refundedAt      DateTime?
+    refundedByUserId String?
+    refundedByUser User?          @relation("PaymentRefundedBy", fields: [refundedByUserId], references: [id], onDelete: SetNull)
+    refundReason    String?
+    notes           String?
+    receiptUrl      String?
+    allocations     PaymentAllocation[]
+    createdAt       DateTime      @default(now())
+    updatedAt       DateTime      @updatedAt
+    @@index([memberId])
+    @@index([status])
+    @@index([paymentType])
+    @@index([paymentDate])
+    @@index([transactionId])
+    @@index([status, paymentDate])
+    @@index([memberId, status])
+    @@index([paymentType, status])
+  }
 
-  @@index([memberId])
-  @@index([status])
-  @@index([paymentType])
-  @@index([paymentDate])
-  @@index([transactionId])
-}
-
-model Donation {
+  model Donation {
   id              String        @id @default(cuid())
   donorName       String
   donorPhone      String?
@@ -171,19 +230,30 @@ model Donation {
   member          MemberProfile? @relation(fields: [memberId], references: [id], onDelete: SetNull)
   amount          Decimal       @db.Decimal(10, 2)
   donationType    DonationType  @default(GENERAL)
-  paymentMethod   PaymentMethod @default(BKASH)
-  transactionId   String?
-  purpose         String?
-  receiptNumber   String?       @unique
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+    paymentMethod   PaymentMethod @default(BKASH)
+    transactionId   String?
+    purpose         String?
+    receiptNumber   String?       @unique
+    status          DonationStatus @default(PENDING)
+    verifiedByUserId String?
+    verifiedByUser User?          @relation("DonationVerifiedBy", fields: [verifiedByUserId], references: [id], onDelete: SetNull)
+    verifiedAt      DateTime?
+    rejectionReason String?
+    refundedAt      DateTime?
+    refundedByUserId String?
+    refundedByUser User?          @relation("DonationRefundedBy", fields: [refundedByUserId], references: [id], onDelete: SetNull)
+    refundReason    String?
+    createdAt       DateTime      @default(now())
+    updatedAt       DateTime      @updatedAt
+    @@index([memberId])
+    @@index([donationType])
+    @@index([createdAt])
+    @@index([status, createdAt])
+    @@index([paymentMethod, createdAt])
+    @@index([memberId, status])
+  }
 
-  @@index([memberId])
-  @@index([donationType])
-  @@index([createdAt])
-}
-
-model BloodDonor {
+  model BloodDonor {
   id              String        @id @default(cuid())
   memberId        String?       @unique
   member          MemberProfile? @relation(fields: [memberId], references: [id], onDelete: Cascade)

@@ -38,6 +38,7 @@ function LoginForm() {
         const result = await loginUser({
           identifier: identifier.trim(),
           password,
+          callbackUrl: callbackUrl || undefined,
         });
 
         if (!result.success) {
@@ -45,7 +46,7 @@ function LoginForm() {
           return;
         }
 
-        const target = callbackUrl || result.redirectTo || "/dashboard";
+        const target = result.redirectTo || "/dashboard";
         router.push(target);
         router.refresh();
       } catch {
