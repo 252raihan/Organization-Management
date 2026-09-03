@@ -6,6 +6,7 @@ import { registerSchema } from "@/lib/validations/auth";
 import { generateNextMemberCode } from "@/lib/member-code";
 import { createAuditLog } from "@/lib/audit";
 import { clearSessionCookie } from "@/lib/auth";
+import { ORGANIZATION_ADDRESS } from "@/lib/constants";
 import { BloodGroup } from "@prisma/client";
 
 export interface RegisterResult {
@@ -45,6 +46,7 @@ export async function registerMember(formData: unknown): Promise<RegisterResult>
       email,
       password,
       bloodGroup,
+      addressHouse,
       presentAddress,
       permanentAddress,
       fatherName,
@@ -52,6 +54,16 @@ export async function registerMember(formData: unknown): Promise<RegisterResult>
       guardianPhone,
       dateOfBirth,
     } = validated.data;
+
+    const addressParts = [
+      addressHouse && `বাড়ি / পাড়া: ${addressHouse}`,
+      ORGANIZATION_ADDRESS.village && `গ্রাম: ${ORGANIZATION_ADDRESS.village}`,
+      ORGANIZATION_ADDRESS.union && `ইউনিয়ন: ${ORGANIZATION_ADDRESS.union}`,
+      ORGANIZATION_ADDRESS.ward && `ওয়ার্ড: ${ORGANIZATION_ADDRESS.ward}`,
+      ORGANIZATION_ADDRESS.upazila && `উপজেলা: ${ORGANIZATION_ADDRESS.upazila}`,
+      ORGANIZATION_ADDRESS.district && `জেলা: ${ORGANIZATION_ADDRESS.district}`,
+    ].filter(Boolean) as string[];
+    const structuredPresentAddress = addressParts.join(", ") || presentAddress?.trim();
 
     // Check duplicate phone
     const existingPhone = await prisma.user.findUnique({
@@ -113,7 +125,7 @@ export async function registerMember(formData: unknown): Promise<RegisterResult>
               memberCode,
               status: "PENDING",
               bloodGroup: bloodGroup as BloodGroup,
-              presentAddress,
+              presentAddress: structuredPresentAddress,
               permanentAddress: permanentAddress || null,
               fatherName: fatherName || null,
               motherName: motherName || null,

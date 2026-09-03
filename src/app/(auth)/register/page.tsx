@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { User, Phone, MapPin, Lock, UserPlus, Mail, Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
-import { BLOOD_GROUPS } from "@/lib/constants";
+import { BLOOD_GROUPS, ORGANIZATION_ADDRESS } from "@/lib/constants";
 import { registerMember } from "@/app/actions/register";
 
 export default function RegisterPage() {
@@ -17,7 +17,7 @@ export default function RegisterPage() {
     phone: "",
     email: "",
     bloodGroup: "",
-    presentAddress: "",
+    addressHouse: "",
     permanentAddress: "",
     password: "",
     confirmPassword: "",
@@ -63,7 +63,7 @@ export default function RegisterPage() {
           phone: formData.phone.trim(),
           email: formData.email.trim() || undefined,
           bloodGroup: formData.bloodGroup,
-          presentAddress: formData.presentAddress.trim(),
+          addressHouse: formData.addressHouse.trim() || undefined,
           permanentAddress: formData.permanentAddress.trim() || undefined,
           password: formData.password,
           confirmPassword: formData.confirmPassword,
@@ -192,22 +192,49 @@ export default function RegisterPage() {
             </select>
           </div>
 
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-foreground">
-              বর্তমান ঠিকানা / গ্রাম *
-            </label>
-            <div className="relative">
-              <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+          <div className="space-y-3 rounded-lg border-border/60 bg-muted/20 p-3">
+            <div className="flex items-center gap-2">
+              <MapPin className="h-4 w-4 text-emerald-600" />
+              <h2 className="text-sm font-semibold text-foreground">বর্তমান ঠিকানা</h2>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-foreground">
+                বাড়ি / পাড়া / মহল্লা (ঐচ্ছিক)
+              </label>
               <Input
-                name="presentAddress"
-                value={formData.presentAddress}
+                name="addressHouse"
+                value={formData.addressHouse}
                 onChange={handleChange}
-                placeholder="গ্রাম/এলাকা, এনায়েতপুর, ফুলবাড়িয়া"
-                className="pl-9"
-                required
+                placeholder="বাড়ি বা পাড়ার নাম লিখুন"
                 disabled={isPending}
               />
             </div>
+
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              {[
+                ["গ্রাম", ORGANIZATION_ADDRESS.village],
+                ["ইউনিয়ন", ORGANIZATION_ADDRESS.union],
+                ["ওয়ার্ড", ORGANIZATION_ADDRESS.ward],
+                ["উপজেলা", ORGANIZATION_ADDRESS.upazila],
+                ["জেলা", ORGANIZATION_ADDRESS.district],
+              ].map(([label, value]) => (
+                <div key={label} className="space-y-1.5">
+                  <label className="text-xs font-semibold text-foreground">{label}</label>
+                  <Input
+                    value={value || ""}
+                    placeholder="তথ্য পরে যোগ হবে"
+                    readOnly
+                    disabled
+                    aria-label={`${label} (সংগঠনের নির্ধারিত)`}
+                    className="bg-muted text-muted-foreground"
+                  />
+                </div>
+              ))}
+            </div>
+            <p className="text-[11px] text-muted-foreground">
+              গ্রাম, ইউনিয়ন, ওয়ার্ড, উপজেলা ও জেলা সংগঠনের নির্ধারিত ঠিকানা অনুযায়ী সংরক্ষিত হবে।
+            </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

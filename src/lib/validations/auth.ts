@@ -55,11 +55,21 @@ export const registerSchema = z
         errorMap: () => ({ message: "রক্তের গ্রুপ নির্বাচন করুন" }),
       }
     ),
+    // New registrations provide only the optional house/neighborhood detail.
+    // The organization-wide village address is applied server-side.
+    addressHouse: z
+      .string()
+      .trim()
+      .max(150, "বাড়ি / পাড়া সর্বোচ্চ ১৫০ অক্ষরের হতে পারে")
+      .optional()
+      .or(z.literal("")),
+    // Kept for callers using the previous single-field registration contract.
     presentAddress: z
       .string()
       .trim()
-      .min(3, "বর্তমান ঠিকানা কমপক্ষে ৩ অক্ষরের হতে হবে")
-      .max(255, "বর্তমান ঠিকানা সর্বোচ্চ ২৫৫ অক্ষরের হতে পারে"),
+      .max(255, "বর্তমান ঠিকানা সর্বোচ্চ ২৫৫ অক্ষরের হতে পারে")
+      .optional()
+      .or(z.literal("")),
     permanentAddress: z
       .string()
       .trim()

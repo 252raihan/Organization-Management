@@ -13,6 +13,18 @@ export const APP_CONFIG = {
 };
 
 /**
+ * Central source of truth for the shared organization address used in member registration.
+ * Keep union and ward empty until the organization confirms their exact values.
+ */
+export const ORGANIZATION_ADDRESS = {
+  village: "গোপীনাথপুর",
+  union: "",
+  ward: "",
+  upazila: "ফুলবাড়িয়া",
+  district: "ময়মনসিংহ",
+} as const;
+
+/**
  * Locked business constant: Required monthly contribution per member (৳100).
  */
 export const MONTHLY_DEPOSIT_AMOUNT = 100;
