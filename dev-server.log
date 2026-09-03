@@ -1,0 +1,116 @@
+
+> gopinathpur-social-welfare@0.1.0 dev
+> next dev --hostname 0.0.0.0 -p 3000
+
+   ▲ Next.js 15.2.0
+   - Local:        http://localhost:3000
+   - Network:      http://0.0.0.0:3000
+   - Environments: .env
+
+ ✓ Starting...
+ ✓ Ready in 2.8s
+ ○ Compiling / ...
+ ✓ Compiled / in 3.6s (857 modules)
+ ✓ Compiled in 926ms (379 modules)
+ GET / 200 in 4634ms
+ ○ Compiling /blood-search ...
+ ✓ Compiled /blood-search in 563ms (853 modules)
+prisma:error 
+Invalid `prisma.bloodDonor.findMany()` invocation:
+
+
+Can't reach database server at `localhost:5432`
+
+Please make sure your database server is running at `localhost:5432`.
+ GET /blood-search 200 in 5010ms
+ ✓ Compiled /donate in 412ms (857 modules)
+ GET /donate 200 in 610ms
+ GET / 200 in 1123ms
+ GET / 200 in 2141ms
+ ○ Compiling /about ...
+ ✓ Compiled /about in 1967ms (875 modules)
+ ✓ Compiled in 928ms (379 modules)
+ GET /about 200 in 2975ms
+ GET /about 200 in 493ms
+ GET /donate 200 in 787ms
+ GET /about 200 in 359ms
+ GET /donate 200 in 245ms
+prisma:error 
+Invalid `prisma.bloodDonor.findMany()` invocation:
+
+
+Can't reach database server at `localhost:5432`
+
+Please make sure your database server is running at `localhost:5432`.
+ GET /blood-search 200 in 4339ms
+prisma:error 
+Invalid `prisma.bloodDonor.findMany()` invocation:
+
+
+Can't reach database server at `localhost:5432`
+
+Please make sure your database server is running at `localhost:5432`.
+ GET /blood-search 200 in 4402ms
+ GET /donate 200 in 1506ms
+ GET /donate 200 in 252ms
+ GET /donate 200 in 126ms
+ ○ Compiling /middleware ...
+ ✓ Compiled /middleware in 4.2s (119 modules)
+ ○ Compiling /login ...
+ ✓ Compiled /login in 4.5s (1021 modules)
+ GET /login 200 in 5138ms
+ GET /login 200 in 306ms
+ GET /donate 200 in 354ms
+ GET /login 200 in 61ms
+ GET /login 200 in 84ms
+ GET /login 200 in 89ms
+ GET /login 200 in 75ms
+ GET /login 200 in 88ms
+ GET /login 200 in 98ms
+prisma:error 
+Invalid `prisma.user.findFirst()` invocation:
+
+
+Can't reach database server at `localhost:5432`
+
+Please make sure your database server is running at `localhost:5432`.
+ POST /login 200 in 5704ms
+prisma:error 
+Invalid `prisma.user.findFirst()` invocation:
+
+
+Can't reach database server at `localhost:5432`
+
+Please make sure your database server is running at `localhost:5432`.
+ POST /login 200 in 6387ms
+ ○ Compiling /_error ...
+ ✓ Compiled /_error in 5.6s (1352 modules)
+ GET /donate 200 in 2497ms
+ GET / 500 in 9258ms
+ GET /donate 200 in 533ms
+ GET / 200 in 699ms
+ GET / 200 in 652ms
+ GET /donate 200 in 498ms
+ GET / 200 in 753ms
+ ○ Compiling /_not-found ...
+ GET / 200 in 1249ms
+ GET / 200 in 1263ms
+ GET / 200 in 1375ms
+ ✓ Compiled /_not-found in 1456ms (1342 modules)
+ GET / 200 in 1070ms
+ GET /_next/static/css/app/layout.css?v=1788430704877 404 in 2347ms
+ GET / 200 in 2078ms
+ GET / 200 in 574ms
+ GET / 200 in 587ms
+ GET / 200 in 563ms
+ GET / 200 in 412ms
+ GET / 200 in 269ms
+ GET / 200 in 1814ms
+ GET /_next/static/css/app/layout.css?v=1788433689131 404 in 330ms
+ GET /_next/static/chunks/webpack.js?v=1788433689131 404 in 727ms
+ GET /_next/static/chunks/main-app.js?v=1788433689131 404 in 727ms
+ GET /_next/static/chunks/app/layout.js 404 in 507ms
+ GET /_next/static/chunks/app/(public)/layout.js 404 in 506ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 509ms
+ GET /_next/static/chunks/app/(auth)/layout.js 404 in 132ms
+ GET /blood-search 500 in 6259ms

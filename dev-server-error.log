@@ -1,0 +1,167 @@
+[BloodSearchPage] Failed to load public donors Error [PrismaClientInitializationError]: 
+Invalid `prisma.bloodDonor.findMany()` invocation:
+
+
+Can't reach database server at `localhost:5432`
+
+Please make sure your database server is running at `localhost:5432`.
+    at async BloodSearchPage (src\app\(public)\blood-search\page.tsx:47:13)
+  45 |
+  46 |   try {
+> 47 |     donors = await getAvailableDonors(params);
+     |             ^
+  48 |   } catch (error) {
+  49 |     console.error("[BloodSearchPage] Failed to load public donors", error);
+  50 |     hasError = true; {
+  clientVersion: '6.4.1',
+  errorCode: undefined
+}
+[BloodSearchPage] Failed to load public donors Error [PrismaClientInitializationError]: 
+Invalid `prisma.bloodDonor.findMany()` invocation:
+
+
+Can't reach database server at `localhost:5432`
+
+Please make sure your database server is running at `localhost:5432`.
+    at async BloodSearchPage (src\app\(public)\blood-search\page.tsx:47:13)
+  45 |
+  46 |   try {
+> 47 |     donors = await getAvailableDonors(params);
+     |             ^
+  48 |   } catch (error) {
+  49 |     console.error("[BloodSearchPage] Failed to load public donors", error);
+  50 |     hasError = true; {
+  clientVersion: '6.4.1',
+  errorCode: undefined
+}
+[BloodSearchPage] Failed to load public donors Error [PrismaClientInitializationError]: 
+Invalid `prisma.bloodDonor.findMany()` invocation:
+
+
+Can't reach database server at `localhost:5432`
+
+Please make sure your database server is running at `localhost:5432`.
+    at async BloodSearchPage (src\app\(public)\blood-search\page.tsx:47:13)
+  45 |
+  46 |   try {
+> 47 |     donors = await getAvailableDonors(params);
+     |             ^
+  48 |   } catch (error) {
+  49 |     console.error("[BloodSearchPage] Failed to load public donors", error);
+  50 |     hasError = true; {
+  clientVersion: '6.4.1',
+  errorCode: undefined
+}
+[Login Error] Error [PrismaClientInitializationError]: 
+Invalid `prisma.user.findFirst()` invocation:
+
+
+Can't reach database server at `localhost:5432`
+
+Please make sure your database server is running at `localhost:5432`.
+    at async loginUser (src\app\actions\login.ts:60:17)
+  58 |
+  59 |     // Query user by phone or email
+> 60 |     const user = await prisma.user.findFirst({
+     |                 ^
+  61 |       where: {
+  62 |         OR: [
+  63 |           { phone: cleanIdentifier }, {
+  clientVersion: '6.4.1',
+  errorCode: undefined
+}
+[Login Error] Error [PrismaClientInitializationError]: 
+Invalid `prisma.user.findFirst()` invocation:
+
+
+Can't reach database server at `localhost:5432`
+
+Please make sure your database server is running at `localhost:5432`.
+    at async loginUser (src\app\actions\login.ts:60:17)
+  58 |
+  59 |     // Query user by phone or email
+> 60 |     const user = await prisma.user.findFirst({
+     |                 ^
+  61 |       where: {
+  62 |         OR: [
+  63 |           { phone: cleanIdentifier }, {
+  clientVersion: '6.4.1',
+  errorCode: undefined
+}
+ ⨯ Error: Cannot find module './285.js'
+Require stack:
+- F:\Organization Management\.next\server\webpack-runtime.js
+- F:\Organization Management\.next\server\app\(auth)\login\page.js
+- F:\Organization Management\node_modules\next\dist\server\require.js
+- F:\Organization Management\node_modules\next\dist\server\load-components.js
+- F:\Organization Management\node_modules\next\dist\build\utils.js
+- F:\Organization Management\node_modules\next\dist\build\swc\options.js
+- F:\Organization Management\node_modules\next\dist\build\swc\index.js
+- F:\Organization Management\node_modules\next\dist\build\analysis\parse-module.js
+- F:\Organization Management\node_modules\next\dist\build\analysis\get-page-static-info.js
+- F:\Organization Management\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- F:\Organization Management\node_modules\next\dist\server\lib\router-server.js
+- F:\Organization Management\node_modules\next\dist\server\lib\start-server.js
+    at __webpack_require__.f.require (F:\Organization Management\.next\server\webpack-runtime.js:198:28)
+    at <unknown> (F:\Organization Management\.next\server\webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (F:\Organization Management\.next\server\webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (F:\Organization Management\.next\server\webpack-runtime.js:162:22)
+    at <unknown> (F:\Organization Management\.next\server\app\(public)\page.js:1:16912)
+    at Object.<anonymous> (F:\Organization Management\.next\server\app\(public)\page.js:1:16969) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array],
+  page: '/'
+}
+ ⨯ Error: Cannot find module './285.js'
+Require stack:
+- F:\Organization Management\.next\server\webpack-runtime.js
+- F:\Organization Management\.next\server\app\_not-found\page.js
+- F:\Organization Management\node_modules\next\dist\server\require.js
+- F:\Organization Management\node_modules\next\dist\server\load-components.js
+- F:\Organization Management\node_modules\next\dist\build\utils.js
+- F:\Organization Management\node_modules\next\dist\build\swc\options.js
+- F:\Organization Management\node_modules\next\dist\build\swc\index.js
+- F:\Organization Management\node_modules\next\dist\build\analysis\parse-module.js
+- F:\Organization Management\node_modules\next\dist\build\analysis\get-page-static-info.js
+- F:\Organization Management\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- F:\Organization Management\node_modules\next\dist\server\lib\router-server.js
+- F:\Organization Management\node_modules\next\dist\server\lib\start-server.js
+    at __webpack_require__.f.require (F:\Organization Management\.next\server\webpack-runtime.js:198:28)
+    at <unknown> (F:\Organization Management\.next\server\webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (F:\Organization Management\.next\server\webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (F:\Organization Management\.next\server\webpack-runtime.js:162:22)
+    at <unknown> (F:\Organization Management\.next\server\app\(public)\blood-search\page.js:1:13526)
+    at Object.<anonymous> (F:\Organization Management\.next\server\app\(public)\blood-search\page.js:1:13579) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array],
+  page: '/blood-search'
+}
+ ⨯ Error: Cannot find module './261.js'
+Require stack:
+- F:\Organization Management\.next\server\webpack-runtime.js
+- F:\Organization Management\.next\server\app\_not-found\page.js
+- F:\Organization Management\node_modules\next\dist\server\require.js
+- F:\Organization Management\node_modules\next\dist\server\load-components.js
+- F:\Organization Management\node_modules\next\dist\build\utils.js
+- F:\Organization Management\node_modules\next\dist\build\swc\options.js
+- F:\Organization Management\node_modules\next\dist\build\swc\index.js
+- F:\Organization Management\node_modules\next\dist\build\analysis\parse-module.js
+- F:\Organization Management\node_modules\next\dist\build\analysis\get-page-static-info.js
+- F:\Organization Management\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- F:\Organization Management\node_modules\next\dist\server\lib\router-server.js
+- F:\Organization Management\node_modules\next\dist\server\lib\start-server.js
+    at __webpack_require__.f.require (F:\Organization Management\.next\server\webpack-runtime.js:198:28)
+    at <unknown> (F:\Organization Management\.next\server\webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (F:\Organization Management\.next\server\webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (F:\Organization Management\.next\server\webpack-runtime.js:162:22)
+    at <unknown> (F:\Organization Management\.next\server\pages\_document.js:1:339)
+    at Object.<anonymous> (F:\Organization Management\.next\server\pages\_document.js:1:381) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
